@@ -50,44 +50,43 @@ export const registerCredential = async () => {
     authenticatorSelection: {
       authenticatorAttachment: 'platform',
       userVerification: 'required',
-      requireResidentKey: false
-    }
-  }
-  
-  const options = await _fetch('/auth/registerRequest', opts)
-  options.user.id = base64url.decode(options.user.id)
-  options.challenge = base64url.decode(options.challenge)
-  
+      requireResidentKey: false,
+    },
+  };
+
+  const options = await _fetch('/auth/registerRequest', opts);
+  options.user.id = base64url.decode(options.user.id);
+  options.challenge = base64url.decode(options.challenge);
+
   if (options.excludeCredentials) {
     for (let cred of options.excludeCredentials) {
-      cred.id = base64url.decode(cred.id)
+      cred.id = base64url.decode(cred.id);
     }
   }
-  
-  
+
   const cred = await navigator.credentials.create({
-    publicKey: options
-  })
-  
-  const credential = {}
-  credential.id = cred.id
-  credential.rawId = base64url.encode(cred.rawId)
-  credential.type = cred.type
-  
+    publicKey: options,
+  });
+
+  const credential = {};
+  credential.id = cred.id;
+  credential.rawId = base64url.encode(cred.rawId);
+  credential.type = cred.type;
+
   if (cred.response) {
-    const clientDataJSON = base64url.encode(cred.response.clientDataJSON)
-    const attestationObject = base64url.encode(cred.response.attestationObject)
+    const clientDataJSON = base64url.encode(cred.response.clientDataJSON);
+    const attestationObject = base64url.encode(cred.response.attestationObject);
     credential.response = {
       clientDataJSON,
-      attestationObject
-    }
+      attestationObject,
+    };
   }
-  
-//   Store credential locally for reuse
+
+  //   Store credential locally for reuse
   localStorage.setItem(`credId`, credential.id);
-  
-  return await _fetch('/auth/registerResponse', credential)
-}
+
+  return await _fetch('/auth/registerResponse', credential);
+};
 
 // TODO (2): Build the UI to register, get and remove credentials
 // 3. Remove the credential: `removeCredential()`
